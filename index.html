@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP8266 Servo Control</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h2, input, p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>ESP8266 Servo Control</h2>
+    <input type="range" id="slider" min="0" max="180" value="90" oninput="updateServo(this.value)">
+    <p>Angle: <span id="angleValue">90</span>°</p>
+
+    <script>
+        function updateServo(angle) {
+            document.getElementById("angleValue").innerText = angle;
+            fetch(`/servo?angle=${angle}`);
+        }
+    </script>
+</body>
+</html>

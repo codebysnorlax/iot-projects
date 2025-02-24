@@ -1,8 +1,8 @@
 import network
 import time
 
-SSID = "your_ssid"   // your router ssid
-PASSWORD = "your_password"  // your router password
+SSID = "your_ssid"   # your router ssid
+PASSWORD = "your_password"  # your router password
 
 def connect_wifi():
     wlan = network.WLAN(network.STA_IF)

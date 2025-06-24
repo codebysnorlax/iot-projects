@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ESP32 Smart Car OTA Update</title>
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #BBDEFB;
+            --accent-color: #FF4081;
+            --text-color: #212121;
+            --text-secondary: #757575;
+            --divider-color: #BDBDBD;
+            --background-color: #F5F5F5;
+            --card-color: #FFFFFF;
+            --success-color: #4CAF50;
+            --warning-color: #FFC107;
+            --danger-color: #F44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            height: 100%;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-dark);
+            font-size: 1.3rem;
+        }
+
+        p {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .button.secondary {
+            background-color: var(--text-secondary);
+        }
+
+        .button.secondary:hover {
+            background-color: #616161;
+        }
+
+        .button.danger {
+            background-color: var(--danger-color);
+        }
+
+        .button.danger:hover {
+            background-color: #D32F2F;
+        }
+
+        .button:disabled {
+            background-color: var(--divider-color);
+            cursor: not-allowed;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+        }
+
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-container input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: var(--divider-color);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            width: 0;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .status.success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+            display: block;
+        }
+
+        .status.error {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            display: block;
+        }
+
+        .status.warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: var(--warning-color);
+            border: 1px solid var(--warning-color);
+            display: block;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background-color: var(--primary-light);
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--divider-color);
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ESP32 Smart Car OTA Update</h1>
+        </header>
+
+        <div class="card">
+            <h2>System Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Current Firmware</div>
+                    <div class="info-value" id="current-firmware">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Free Space</div>
+                    <div class="info-value" id="free-space">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Last Update</div>
+                    <div class="info-value" id="last-update">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Battery Level</div>
+                    <div class="info-value" id="battery-level">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" data-tab="firmware">Firmware Update</div>
+                <div class="tab" data-tab="spiffs">Web Interface Update</div>
+            </div>
+            
+            <div class="tab-content active" id="firmware-tab">
+                <h2>Firmware Update</h2>
+                <p>Upload a new firmware binary (.bin) file to update the ESP32 Smart Car firmware. The device will restart automatically after the update is complete.</p>
+                <p><strong>Warning:</strong> Make sure the battery is fully charged before updating. Do not disconnect power during the update process.</p>
+                
+                <div class="form-group">
+                    <label for="firmware-file">Select Firmware File (.bin):</label>
+                    <div class="file-input-container">
+                        <div class="file-input-button">Choose File</div>
+                        <input type="file" id="firmware-file" accept=".bin" onchange="updateFileName(this, 'firmware-file-name')">
+                    </div>
+                    <div class="file-name" id="firmware-file-name">No file selected</div>
+                </div>
+                
+                <div class="progress-container" id="firmware-progress-container" style="display: none;">
+                    <div class="progress-bar" id="firmware-progress-bar"></div>
+                    <div class="progress-text" id="firmware-progress-text">0%</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="button" id="upload-firmware-btn" onclick="uploadFirmware()">Upload & Install Firmware</button>
+                    <button class="button secondary" onclick="checkForUpdates()">Check for Updates</button>
+                </div>
+                
+                <div id="firmware-status" class="status"></div>
+            </div>
+            
+            <div class="tab-content" id="spiffs-tab">
+                <h2>Web Interface Update</h2>
+                <p>Upload a new web interface package (.zip) file to update the ESP32 Smart Car web interface. The device will restart automatically after the update is complete.</p>
+                
+                <div class="form-group">
+                    <label for="spiffs-file">Select Web Interface Package (.zip):</label>
+                    <div class="file-input-container">
+                        <div class="file-input-button">Choose File</div>
+                        <input type="file" id="spiffs-file" accept=".zip" onchange="updateFileName(this, 'spiffs-file-name')">
+                    </div>
+                    <div class="file-name" id="spiffs-file-name">No file selected</div>
+                </div>
+                
+                <div class="progress-container" id="spiffs-progress-container" style="display: none;">
+                    <div class="progress-bar" id="spiffs-progress-bar"></div>
+                    <div class="progress-text" id="spiffs-progress-text">0%</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="button" id="upload-spiffs-btn" onclick="uploadSPIFFS()">Upload & Install Web Interface</button>
+                </div>
+                
+                <div id="spiffs-status" class="status"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Update History</h2>
+            <p>Recent firmware and web interface updates.</p>
+            <div id="update-history">
+                <p>No update history available.</p>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-link">← Back to Control Panel</a>
+    </div>
+
+    <script>
+        // WebSocket connection
+        let socket;
+        let isConnected = false;
+        let updateInProgress = false;
+        
+        // Initialize WebSocket connection
+        function initWebSocket() {
+            // Close any existing socket
+            if (socket) {
+                socket.close();
+            }
+            
+            // Get the WebSocket URL
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            // Create a new WebSocket connection
+            socket = new WebSocket(wsUrl);
+            
+            // WebSocket event handlers
+            socket.onopen = () => {
+                console.log('WebSocket connected');
+                isConnected = true;
+                
+                // Request system information
+                requestSystemInfo();
+            };
+            
+            socket.onclose = () => {
+                console.log('WebSocket disconnected');
+                isConnected = false;
+                
+                // Attempt to reconnect after 5 seconds
+                setTimeout(initWebSocket, 5000);
+            };
+            
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                isConnected = false;
+            };
+            
+            socket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                }
+            };
+        }
+        
+        // Handle WebSocket messages
+        function handleWebSocketMessage(data) {
+            if (data.type === 'system_info') {
+                updateSystemInfo(data);
+            } else if (data.type === 'update_progress') {
+                updateProgress(data);
+            } else if (data.type === 'update_result') {
+                updateResult(data);
+            } else if (data.type === 'update_history') {
+                updateHistory(data.history);
+            }
+        }
+        
+        // Update system information
+        function updateSystemInfo(data) {
+            document.getElementById('current-firmware').textContent = data.firmware_version || '-';
+            document.getElementById('free-space').textContent = formatBytes(data.free_space) || '-';
+            document.getElementById('last-update').textContent = data.last_update || 'Never';
+            document.getElementById('battery-level').textContent = data.battery_level ? `${data.battery_level}%` : '-';
+            
+            // Check if battery level is too low for update
+            if (data.battery_level && data.battery_level < 30) {
+                showStatus('Battery level is low. Please charge before updating.', 'warning', 'firmware-status');
+                document.getElementById('upload-firmware-btn').disabled = true;
+                document.getElementById('upload-spiffs-btn').disabled = true;
+            } else {
+                document.getElementById('upload-firmware-btn').disabled = false;
+                document.getElementById('upload-spiffs-btn').disabled = false;
+            }
+        }
+        
+        // Update progress
+        function updateProgress(data) {
+            const type = data.update_type;
+            const progress = data.progress;
+            const progressContainer = document.getElementById(`${type}-progress-container`);
+            const progressBar = document.getElementById(`${type}-progress-bar`);
+            const progressText = document.getElementById(`${type}-progress-text`);
+            
+            progressContainer.style.display = 'block';
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${progress}%`;
+            
+            if (progress === 100) {
+                showStatus('Upload complete. Installing update...', 'success', `${type}-status`);
+            }
+        }
+        
+        // Update result
+        function updateResult(data) {
+            const type = data.update_type;
+            const success = data.success;
+            const message = data.message;
+            
+            updateInProgress = false;
+            
+            if (success) {
+                showStatus(`Update successful: ${message}. The device will restart.`, 'success', `${type}-status`);
+                
+                // Disable buttons during restart
+                document.getElementById('upload-firmware-btn').disabled = true;
+                document.getElementById('upload-spiffs-btn').disabled = true;
+                
+                // Try to reconnect after 30 seconds
+                setTimeout(() => {
+                    window.location.reload();
+                }, 30000);
+            } else {
+                showStatus(`Update failed: ${message}`, 'error', `${type}-status`);
+            }
+        }
+        
+        // Update history
+        function updateHistory(history) {
+            const historyContainer = document.getElementById('update-history');
+            
+            if (!history || history.length === 0) {
+                historyContainer.innerHTML = '<p>No update history available.</p>';
+                return;
+            }
+            
+            let html = '';
+            history.forEach(item => {
+                const date = new Date(item.timestamp * 1000).toLocaleString();
+                const type = item.type === 'firmware' ? 'Firmware' : 'Web Interface';
+                const success = item.success ? 'Success' : 'Failed';
+                const version = item.version || 'Unknown';
+                
+                html += `<p><strong>${date}</strong> - ${type} update to v${version}: <span style="color: ${item.success ? 'var(--success-color)' : 'var(--danger-color)'}">${success}</span></p>`;
+            });
+            
+            historyContainer.innerHTML = html;
+        }
+        
+        // Request system information
+        function requestSystemInfo() {
+            if (!isConnected) return;
+            
+            const message = {
+                type: 'get_system_info'
+            };
+            
+            socket.send(JSON.stringify(message));
+        }
+        
+        // Check for updates
+        function checkForUpdates() {
+            fetch('/api/update/check')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.update_available) {
+                        showStatus(`Update available: v${data.version}. ${data.description}`, 'success', 'firmware-status');
+                    } else {
+                        showStatus('No updates available. You have the latest version.', 'success', 'firmware-status');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking for updates:', error);
+                    showStatus('Error checking for updates', 'error', 'firmware-status');
+                });
+        }
+        
+        // Upload firmware
+        function uploadFirmware() {
+            const fileInput = document.getElementById('firmware-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showStatus('Please select a firmware file', 'error', 'firmware-status');
+                return;
+            }
+            
+            if (file.size > 2000000) {
+                showStatus('File is too large. Maximum size is 2MB.', 'error', 'firmware-status');
+                return;
+            }
+            
+            if (!file.name.endsWith('.bin')) {
+                showStatus('Invalid file type. Please select a .bin file.', 'error', 'firmware-status');
+                return;
+            }
+            
+            if (updateInProgress) {
+                showStatus('An update is already in progress', 'error', 'firmware-status');
+                return;
+            }
+            
+            updateInProgress = true;
+            
+            // Show progress container
+            const progressContainer = document.getElementById('firmware-progress-container');
+            const progressBar = document.getElementById('firmware-progress-bar');
+            const progressText = document.getElementById('firmware-progress-text');
+            
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressText.textContent = '0%';
+            
+            // Create FormData and append file
+            const formData = new FormData();
+            formData.append('firmware', file);
+            
+            // Create XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+            
+            // Track upload progress
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const progress = Math.round((event.loaded / event.total) * 100);
+                    progressBar.style.width = `${progress}%`;
+                    progressText.textContent = `${progress}%`;
+                }
+            };
+            
+            // Handle response
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            showStatus('Firmware uploaded successfully. Installing...', 'success', 'firmware-status');
+                        } else {
+                            updateInProgress = false;
+                            showStatus(`Upload failed: ${response.message}`, 'error', 'firmware-status');
+                        }
+                    } catch (error) {
+                        updateInProgress = false;
+                        showStatus('Error parsing response', 'error', 'firmware-status');
+                    }
+                } else {
+                    updateInProgress = false;
+                    showStatus(`Upload failed with status ${xhr.status}`, 'error', 'firmware-status');
+                }
+            };
+            
+            // Handle error
+            xhr.onerror = () => {
+                updateInProgress = false;
+                showStatus('Upload failed due to network error', 'error', 'firmware-status');
+            };
+            
+            // Send request
+            xhr.open('POST', '/api/update/firmware', true);
+            xhr.send(formData);
+            
+            showStatus('Uploading firmware...', 'warning', 'firmware-status');
+        }
+        
+        // Upload SPIFFS
+        function uploadSPIFFS() {
+            const fileInput = document.getElementById('spiffs-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showStatus('Please select a web interface package', 'error', 'spiffs-status');
+                return;
+            }
+            
+            if (file.size > 2000000) {
+                showStatus('File is too large. Maximum size is 2MB.', 'error', 'spiffs-status');
+                return;
+            }
+            
+            if (!file.name.endsWith('.zip')) {
+                showStatus('Invalid file type. Please select a .zip file.', 'error', 'spiffs-status');
+                return;
+            }
+            
+            if (updateInProgress) {
+                showStatus('An update is already in progress', 'error', 'spiffs-status');
+                return;
+            }
+            
+            updateInProgress = true;
+            
+            // Show progress container
+            const progressContainer = document.getElementById('spiffs-progress-container');
+            const progressBar = document.getElementById('spiffs-progress-bar');
+            const progressText = document.getElementById('spiffs-progress-text');
+            
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressText.textContent = '0%';
+            
+            // Create FormData and append file
+            const formData = new FormData();
+            formData.append('spiffs', file);
+            
+            // Create XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+            
+            // Track upload progress
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const progress = Math.round((event.loaded / event.total) * 100);
+                    progressBar.style.width = `${progress}%`;
+                    progressText.textContent = `${progress}%`;
+                }
+            };
+            
+            // Handle response
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            showStatus('Web interface uploaded successfully. Installing...', 'success', 'spiffs-status');
+                        } else {
+                            updateInProgress = false;
+                            showStatus(`Upload failed: ${response.message}`, 'error', 'spiffs-status');
+                        }
+                    } catch (error) {
+                        updateInProgress = false;
+                        showStatus('Error parsing response', 'error', 'spiffs-status');
+                    }
+                } else {
+                    updateInProgress = false;
+                    showStatus(`Upload failed with status ${xhr.status}`, 'error', 'spiffs-status');
+                }
+            };
+            
+            // Handle error
+            xhr.onerror = () => {
+                updateInProgress = false;
+                showStatus('Upload failed due to network error', 'error', 'spiffs-status');
+            };
+            
+            // Send request
+            xhr.open('POST', '/api/update/spiffs', true);
+            xhr.send(formData);
+            
+            showStatus('Uploading web interface...', 'warning', 'spiffs-status');
+        }
+        
+        // Update file name
+        function updateFileName(input, elementId) {
+            const fileName = input.files.length > 0 ? input.files[0].name : 'No file selected';
+            document.getElementById(elementId).textContent = fileName;
+        }
+        
+        // Show status message
+        function showStatus(message, type, elementId) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.textContent = message;
+            statusElement.className = 'status';
+            statusElement.classList.add(type);
+        }
+        
+        // Format bytes
+        function formatBytes(bytes) {
+            if (!bytes && bytes !== 0) return '-';
+            
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            if (bytes === 0) return '0 B';
+            
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+        }
+        
+        // Tab switching
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to selected tab and content
+                    tab.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            initWebSocket();
+            setupTabs();
+            
+            // Request update history
+            fetch('/api/update/history')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.history) {
+                        updateHistory(data.history);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching update history:', error);
+                });
+        });
+    </script>
+</body>
+</html>

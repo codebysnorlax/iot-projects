@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ESP32 Smart Car Control</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>ESP32 Smart Car</h1>
+            <div class="connection-status">
+                <span id="connection-icon" class="connected"></span>
+                <span id="connection-text">Connected</span>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            <div class="panel battery-panel">
+                <h2>Battery</h2>
+                <div class="battery-indicator">
+                    <div id="battery-level" class="battery-level" style="width: 80%;"></div>
+                </div>
+                <div class="battery-details">
+                    <span id="battery-percentage">80%</span>
+                    <span id="battery-voltage">7.4V</span>
+                </div>
+            </div>
+
+            <div class="panel system-panel">
+                <h2>System</h2>
+                <div class="system-info">
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span id="system-status" class="info-value">Normal</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Uptime:</span>
+                        <span id="system-uptime" class="info-value">00:10:25</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Version:</span>
+                        <span id="system-version" class="info-value">1.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <div class="control-panel">
+                <div class="joystick-container">
+                    <div id="joystick-zone" class="joystick-zone"></div>
+                </div>
+                <div class="speed-indicators">
+                    <div class="speed-indicator left">
+                        <div class="speed-label">Left</div>
+                        <div class="speed-bar-container">
+                            <div id="left-speed-bar" class="speed-bar" style="height: 50%;"></div>
+                        </div>
+                        <div id="left-speed-value" class="speed-value">50%</div>
+                    </div>
+                    <div class="speed-indicator right">
+                        <div class="speed-label">Right</div>
+                        <div class="speed-bar-container">
+                            <div id="right-speed-bar" class="speed-bar" style="height: 50%;"></div>
+                        </div>
+                        <div id="right-speed-value" class="speed-value">50%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="headlights-btn" class="action-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z" />
+                    </svg>
+                    <span>Headlights</span>
+                </button>
+                <button id="taillights-btn" class="action-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z" />
+                    </svg>
+                    <span>Taillights</span>
+                </button>
+                <button id="indicators-btn" class="action-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
+                    </svg>
+                    <span>Indicators</span>
+                </button>
+                <button id="horn-btn" class="action-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19,11H5V8H19V11M7,4A1,1 0 0,0 6,5A1,1 0 0,0 7,6A1,1 0 0,0 8,5A1,1 0 0,0 7,4M17,4A1,1 0 0,0 16,5A1,1 0 0,0 17,6A1,1 0 0,0 18,5A1,1 0 0,0 17,4M7,18A1,1 0 0,0 6,19A1,1 0 0,0 7,20A1,1 0 0,0 8,19A1,1 0 0,0 7,18M17,18A1,1 0 0,0 16,19A1,1 0 0,0 17,20A1,1 0 0,0 18,19A1,1 0 0,0 17,18M12,2C7.58,2 4,2.5 4,6V15.5C4,17.43 5.57,19 7.5,19L6,20.5V21H18V20.5L16.5,19C18.43,19 20,17.43 20,15.5V6C20,2.5 16.42,2 12,2Z" />
+                    </svg>
+                    <span>Horn</span>
+                </button>
+            </div>
+
+            <div class="indicator-controls hidden" id="indicator-controls">
+                <button id="left-indicator-btn" class="indicator-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" />
+                    </svg>
+                    <span>Left</span>
+                </button>
+                <button id="hazard-indicator-btn" class="indicator-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
+                    </svg>
+                    <span>Hazard</span>
+                </button>
+                <button id="right-indicator-btn" class="indicator-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
+                    </svg>
+                    <span>Right</span>
+                </button>
+                <button id="off-indicator-btn" class="indicator-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+                    </svg>
+                    <span>Off</span>
+                </button>
+            </div>
+
+            <div class="underglow-controls hidden" id="underglow-controls">
+                <div class="color-picker">
+                    <input type="color" id="underglow-color" value="#00ff00">
+                    <label for="underglow-color">Color</label>
+                </div>
+                <div class="mode-selector">
+                    <select id="underglow-mode">
+                        <option value="0">Static</option>
+                        <option value="1">Breathing</option>
+                        <option value="2">Rainbow</option>
+                        <option value="3">Chase</option>
+                    </select>
+                    <label for="underglow-mode">Mode</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-bar">
+            <button id="control-tab-btn" class="menu-button active">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7,2H17A2,2 0 0,1 19,4V20A2,2 0 0,1 17,22H7A2,2 0 0,1 5,20V4A2,2 0 0,1 7,2M7,4V20H17V4H7M16,11V9H8V11H16M16,15V13H8V15H16M8,7H16V5H8V7Z" />
+                </svg>
+                <span>Control</span>
+            </button>
+            <button id="lights-tab-btn" class="menu-button">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63Z" />
+                </svg>
+                <span>Lights</span>
+            </button>
+            <button id="settings-tab-btn" class="menu-button">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" />
+                </svg>
+                <span>Settings</span>
+            </button>
+        </div>
+
+        <div id="settings-panel" class="settings-panel hidden">
+            <h2>Settings</h2>
+            <div class="settings-group">
+                <h3>Calibration</h3>
+                <div class="setting-item">
+                    <button id="calibrate-motors-btn" class="setting-button">Calibrate Motors</button>
+                </div>
+                <div class="setting-item">
+                    <button id="calibrate-battery-btn" class="setting-button">Calibrate Battery</button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3>System</h3>
+                <div class="setting-item">
+                    <button id="reset-failsafe-btn" class="setting-button">Reset Failsafe</button>
+                </div>
+                <div class="setting-item">
+                    <button id="check-update-btn" class="setting-button">Check for Updates</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="battery-calibration-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Battery Calibration</h2>
+                <p>Enter the actual battery voltage measured with a multimeter:</p>
+                <input type="number" id="measured-voltage" step="0.01" min="0" max="15" value="7.40">
+                <div class="modal-buttons">
+                    <button id="cancel-battery-cal-btn" class="modal-button">Cancel</button>
+                    <button id="confirm-battery-cal-btn" class="modal-button primary">Calibrate</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script src="js/nipplejs.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

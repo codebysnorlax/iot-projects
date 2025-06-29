@@ -1,0 +1,4 @@
+#define WIFI_SSID "Ravi4G"
+#define WIFI_PASS "Ravi4321"
+#define BOT_TOKEN "7552827985:AAHc0UrHHcyX-SzE9Uay2lUKyjk7XqahzIM"
+#define CHAT_ID "5442726683"

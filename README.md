@@ -100,14 +100,6 @@ Contributions to improve existing projects or add new ones are welcome! Please f
 - New IoT projects using ESP8266/ESP32
 - Enhancements to existing projects
 
-## Future Project Ideas
-
-- Weather station with online dashboard
-- Home automation system
-- IoT plant monitoring system
-- ESP32 camera applications
-- MQTT-based IoT communication
-
 ---
 
 ## Author

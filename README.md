@@ -1,124 +1,126 @@
-# ESP8266 Servo Control Web Server
+# IoT Projects Repository
 
-## Overview
-This project allows you to control a servo motor connected to an ESP8266/ESP32 through a web-based interface. The ESP8266 runs a web server, which serves an HTML page with a slider to adjust the servo angle. The slider value is sent to the ESP8266 via HTTP requests, and the servo moves accordingly.
+This repository contains a collection of Internet of Things (IoT) projects using ESP8266 and ESP32 microcontrollers. Each project demonstrates different aspects of IoT development, from basic hardware control to web interfaces and cloud connectivity.
 
-## Features
-- Connects ESP8266 to a Wi-Fi network.
-- Runs a web server to serve an HTML control page.
-- Allows real-time control of a servo motor via a web-based slider.
+## Projects Overview
 
-## Hardware Requirements
-- ESP8266 or ESP32
-- SG90 Servo Motor
-- Jumper Wires
-- Power Supply (USB or external 5V source)
+This repository is organized by microcontroller type, with each project having its own dedicated folder and documentation.
 
-## Software Requirements
-- MicroPython installed on ESP8266/ESP32
-- A tool to upload files (like `ampy` or `WebREPL`)
+### ESP8266 Projects
 
-## Setup Instructions
-1. **Flash MicroPython** onto your ESP8266/ESP32 if not already installed.
-2. **Upload Files**:
-   - `main.py` (handles Wi-Fi connection and server logic)
-   - `index.html` (web interface for controlling the servo)
-3. **Edit Wi-Fi Credentials** in `main.py`:
-   ```python
-   SSID = "your_ssid"   # Your Wi-Fi SSID
-   PASSWORD = "your_password"  # Your Wi-Fi Password
+Explore the `/ESP-8266/` directory for projects using the ESP8266 microcontroller. Each project folder contains its own README with detailed information.
+
+### ESP32 Projects
+
+Explore the `/ESP-32/` directory for projects using the ESP32 microcontroller. Each project folder contains its own README with detailed information.
+
+### Project Structure
+
+Each project is self-contained with:
+- Source code
+- Detailed README
+- Wiring diagrams (where applicable)
+- Configuration instructions
+
+## Getting Started
+
+### Prerequisites
+
+- ESP8266 or ESP32 development board
+- USB cable for programming
+- Arduino IDE or PlatformIO (depending on the project)
+  - PlatformIO is recommended for Arduino framework projects
+  - Arduino IDE can be used with appropriate board configurations
+- For MicroPython projects: 
+  - MicroPython firmware flashed to your device
+  - A tool to upload files (like `ampy`, `rshell`, or `WebREPL`)
+- Basic electronics components as specified in each project
+
+### General Setup Instructions
+
+1. Clone this repository:
    ```
-4. **Restart ESP8266** and access the web interface using the IP address printed in the serial monitor.
+   git clone https://github.com/yourusername/iot-projects.git
+   ```
 
-## Code Explanation
-### `main.py` - Connecting to Wi-Fi
-This script connects the ESP8266 to a Wi-Fi network. If unsuccessful, it retries for 10 seconds before failing.
-```python
-import network
-import time
+2. Navigate to the microcontroller directory you're interested in:
+   - For ESP8266 projects: `cd ESP-8266/`
+   - For ESP32 projects: `cd ESP-32/`
 
-def connect_wifi():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    
-    if not wlan.isconnected():
-        print("Connecting to Wi-Fi...")
-        wlan.connect(SSID, PASSWORD)
+3. Choose a specific project directory and follow its README instructions for detailed setup
 
-        timeout = 10
-        while not wlan.isconnected() and timeout > 0:
-            time.sleep(1)
-            timeout -= 1
-            print("Retrying...")
+### Development Environment
 
-    if wlan.isconnected():
-        print("Connected! IP Address:", wlan.ifconfig()[0])
-    else:
-        print("Failed to connect. Check SSID/Password.")
-```
+Projects in this repository use various development environments:
 
-### `main.py` - Web Server & Servo Control
-This script sets up a web server on ESP8266 and controls a servo motor based on HTTP requests.
-```python
-import socket
-import machine
+- **PlatformIO Projects**:
+  - Open the project folder in VSCode with PlatformIO extension
+  - Configure `platformio.ini` as needed
+  - Build and upload using PlatformIO commands
 
-# Initialize Servo on GPIO2 (D4)
-servo = machine.PWM(machine.Pin(2), freq=50)
+- **MicroPython Projects**:
+  - Flash MicroPython firmware to your device
+  - Upload the project files using your preferred tool
+  - Connect to the device's REPL for debugging
 
-def set_angle(angle):
-    duty = int((angle / 180) * 75) + 40  # Convert angle to PWM duty cycle
-    servo.duty(duty)
+Refer to each project's README for specific environment setup instructions.
 
-# Start Web Server
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(('', 80))
-s.listen(5)
+## Project-Specific Documentation
 
-print("Web server running...")
+**Important:** All project details are maintained in their respective README files, not in this main README. This approach ensures that:
 
-while True:
-    conn, addr = s.accept()
-    request = conn.recv(1024).decode()
-    
-    if "GET /servo?angle=" in request:
-        try:
-            angle = int(request.split("GET /servo?angle=")[1].split(" ")[0])
-            set_angle(angle)
-            print("Servo angle set to:", angle)
-            response = "HTTP/1.1 200 OK\n\nOK"
-        except:
-            response = "HTTP/1.1 400 Bad Request\n\nInvalid Angle"
-    else:
-        response = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n" + read_html()
-    
-    conn.send(response)
-    conn.close()
-```
+1. Adding new projects doesn't require updating the main README
+2. Project documentation stays close to the code
+3. Each project can have its own detailed documentation
 
-### `index.html` - Web Interface
-This HTML page provides a slider to control the servo's angle in real-time.
-```html
-<input type="range" id="slider" min="0" max="180" value="90" oninput="updateServo(this.value)">
-<p>Angle: <span id="angleValue">90</span>°</p>
-
-<script>
-    function updateServo(angle) {
-        document.getElementById("angleValue").innerText = angle;
-        fetch(`/servo?angle=${angle}`);
-    }
-</script>
-```
-
-## How to Use
-1. Power on your ESP8266/ESP32.
-2. Find the IP address printed in the serial monitor.
-3. Open the IP address in a web browser.
-4. Adjust the slider to control the servo motor.
+Each project folder contains its own README with detailed instructions for:
+- Hardware requirements and wiring diagrams
+- Software dependencies and versions
+- Setup and configuration steps
+- Usage instructions and examples
+- Troubleshooting common issues
 
 ## License
-This project is open-source and can be used freely for educational purposes.
+
+All projects in this repository are open-source and available for personal and educational use under the MIT License unless otherwise specified in individual project folders.
+
+## Contribution Guidelines
+
+Contributions to improve existing projects or add new ones are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a new branch for your feature (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Contribution Ideas
+- Bug fixes and optimizations
+- Documentation improvements
+- New IoT projects using ESP8266/ESP32
+- Enhancements to existing projects
+
+## Future Project Ideas
+
+- Weather station with online dashboard
+- Home automation system
+- IoT plant monitoring system
+- ESP32 camera applications
+- MQTT-based IoT communication
 
 ---
-Enjoy coding with ESP8266! 🚀
+
+## Author
+
+[Snorlax | Ravi Ranjan Sharma](https://www.instagram.com/nr_snorlax/)
+
+---
+
+Enjoy exploring the world of IoT with these projects! 🚀
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/arduino/arduino-cli/master/docs/img/Arduino_logo_circle.svg.png" width="80">
+  <img src="https://avatars.githubusercontent.com/u/6771446" width="80">
+  <img src="https://micropython.org/static/img/Mlogo_138wh.png" width="80">
+</p>
 

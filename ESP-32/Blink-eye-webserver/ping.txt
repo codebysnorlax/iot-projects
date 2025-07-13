@@ -1,0 +1,12 @@
+$ ping 192.168.29.92
+
+Pinging 192.168.29.92 with 32 bytes of data:
+Reply from 192.168.29.92: bytes=32 time=346ms TTL=255
+Reply from 192.168.29.92: bytes=32 time=181ms TTL=255
+Reply from 192.168.29.92: bytes=32 time=114ms TTL=255
+Reply from 192.168.29.92: bytes=32 time=98ms TTL=255
+
+Ping statistics for 192.168.29.92:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 98ms, Maximum = 346ms, Average = 184ms

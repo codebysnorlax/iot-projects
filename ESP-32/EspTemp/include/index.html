@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .temp-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .temp-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(10%, 10%); }
+        }
+
+        .temp-value {
+            font-size: 72px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .temp-unit {
+            font-size: 32px;
+            vertical-align: super;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .status.connected {
+            background: rgba(76, 175, 80, 0.2);
+            color: white;
+        }
+
+        .status.disconnected {
+            background: rgba(244, 67, 54, 0.2);
+            color: white;
+        }
+
+        .status.error {
+            background: rgba(255, 152, 0, 0.2);
+            color: white;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .info-card {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .chart-container {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .chart {
+            width: 100%;
+            height: 150px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .temp-value {
+                font-size: 56px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌡️ Temperature Monitor</h1>
+
+        <div class="temp-display">
+            <div class="temp-value">
+                <span id="temperature">--</span><span class="temp-unit">°C</span>
+            </div>
+            <div class="status" id="status">Connecting...</div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-label">Min Temp</div>
+                <div class="info-value" id="minTemp">--°C</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Max Temp</div>
+                <div class="info-value" id="maxTemp">--°C</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="info-label" style="margin-bottom: 10px;">Temperature History</div>
+            <canvas class="chart" id="tempChart"></canvas>
+        </div>
+
+        <div class="footer">
+            Last update: <span id="lastUpdate">Never</span>
+        </div>
+    </div>
+
+    <script>
+        let ws;
+        let minTemp = Infinity;
+        let maxTemp = -Infinity;
+        let tempHistory = [];
+        let updateCount = 0;
+        let lastDrawTime = 0;
+        const maxHistoryLength = 100;  // More data points for smoother chart
+
+        // Chart setup
+        const canvas = document.getElementById('tempChart');
+        const ctx = canvas.getContext('2d');
+
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.hostname}/ws`);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                updateStatus('connected', 'Connected');
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+
+                    if (data.status === 'error') {
+                        document.getElementById('temperature').textContent = 'ERR';
+                        updateStatus('error', 'Sensor Error');
+                    } else {
+                        const temp = parseFloat(data.temperature);
+                        updateTemperature(temp);
+                        updateStatus('connected', 'Connected');
+                    }
+
+                    updateLastUpdate();
+                } catch (e) {
+                    console.error('Error parsing message:', e);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateStatus('error', 'Connection Error');
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                updateStatus('disconnected', 'Disconnected');
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function updateTemperature(temp) {
+            document.getElementById('temperature').textContent = temp.toFixed(1);
+
+            // Update min/max
+            if (temp < minTemp) {
+                minTemp = temp;
+                document.getElementById('minTemp').textContent = temp.toFixed(1) + '°C';
+            }
+            if (temp > maxTemp) {
+                maxTemp = temp;
+                document.getElementById('maxTemp').textContent = temp.toFixed(1) + '°C';
+            }
+
+            // Update history
+            tempHistory.push(temp);
+            if (tempHistory.length > maxHistoryLength) {
+                tempHistory.shift();
+            }
+
+            // Throttle chart redraw to 60fps max (every ~16ms)
+            updateCount++;
+            const now = performance.now();
+            if (now - lastDrawTime > 16) {
+                drawChart();
+                lastDrawTime = now;
+            }
+        }
+
+        function updateStatus(type, text) {
+            const statusEl = document.getElementById('status');
+            statusEl.className = 'status ' + type;
+            statusEl.textContent = text;
+        }
+
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            document.getElementById('lastUpdate').textContent = timeStr;
+        }
+
+        function drawChart() {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            if (tempHistory.length < 2) return;
+
+            const minVal = Math.min(...tempHistory) - 1;
+            const maxVal = Math.max(...tempHistory) + 1;
+            const range = maxVal - minVal;
+
+            const xStep = width / (maxHistoryLength - 1);
+            const yScale = height / range;
+
+            // Draw line
+            ctx.beginPath();
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+
+            tempHistory.forEach((temp, i) => {
+                const x = i * xStep;
+                const y = height - ((temp - minVal) * yScale);
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+
+            ctx.stroke();
+
+            // Draw gradient fill
+            ctx.lineTo(width, height);
+            ctx.lineTo(0, height);
+            ctx.closePath();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, 'rgba(102, 126, 234, 0.3)');
+            gradient.addColorStop(1, 'rgba(102, 126, 234, 0.05)');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+
+        // Set canvas size
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            drawChart();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Start connection
+        connectWebSocket();
+    </script>
+</body>
+</html>

@@ -22,7 +22,7 @@ Real-time temperature monitoring system using ESP32 and DS18B20 sensor with a mo
 ```
 DS18B20 Sensor:
 - VDD (Red)    → ESP32 3.3V
-- GND (Black)  → ESP32 GND  
+- GND (Black)  → ESP32 GND
 - DATA (Yellow)→ ESP32 GPIO4 (with 4.7kΩ pull-up to 3.3V)
 ```
 
@@ -43,9 +43,8 @@ brew install platformio
 ### 2. Clone and Setup Project
 
 ```bash
-git clone <your-repo-url>
-cd EspTemp
-```
+git clone "https://github.com/codebysnorlax/iot-projects.git"
+cd iot-projects/ESP32/EspTemp
 
 ### 3. Configure WiFi
 
@@ -158,7 +157,7 @@ Web server started
 All dependencies are automatically managed by PlatformIO:
 
 - `OneWire` - DS18B20 communication
-- `DallasTemperature` - Temperature sensor library  
+- `DallasTemperature` - Temperature sensor library
 - `ESPAsyncWebServer` - Async web server
 - `AsyncTCP` - TCP library for ESP32
 

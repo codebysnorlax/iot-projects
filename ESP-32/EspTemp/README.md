@@ -64,6 +64,13 @@ const char *password = "Your_WiFi_Password";
 ### 4. Upload Web Interface
 
 The HTML file must be uploaded to ESP32's SPIFFS filesystem:
+#### For platformio setup
+if you are in vscode and alrady have platformio extension installed and you can see at botton a icon usually you need only 3 icons, 1. tick mark for compile the code, 2. right arrow for uplaod the code. 3. a pluck for serial monitor.
+
+#### For command line setup in platformio
+
+if you are are comfortable with command line you can use the following commands to upload the code and monitor the serial output.
+just make sure you use right terminal use can open platformio terminal just click ctrl+shift+p and search for platformio terminal and select it. and all done.
 
 ```bash
 # Upload filesystem (contains index.html)
@@ -74,6 +81,13 @@ platformio run --target upload
 
 # Monitor serial output
 platformio device monitor
+```
+
+```bash
+pio run --target erase
+pio run --target uploadfs
+pio run --target upload
+pio device monitor
 ```
 
 ### 5. Access Web Interface

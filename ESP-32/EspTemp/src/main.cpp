@@ -6,7 +6,7 @@
 #include <SPIFFS.h>
 
 // WiFi credentials
-const char *ssid = "Ravi5G";
+const char *ssid = "Ravi4G";
 const char *password = "Ravi4321";
 
 // DS18B20 Configuration

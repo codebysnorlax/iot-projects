@@ -26,6 +26,12 @@ DS18B20 Sensor:
 - DATA (Yellow)→ ESP32 GPIO4 (with 4.7kΩ pull-up to 3.3V)
 ```
 
+>[!Note]
+> Ensure resistor is connected between DATA and VDD pins.
+> You must not connect VDD to 5V as it may damage the ESP32.
+> You must not connect resistor in series with DATA line.
+
+
 ## Software Setup
 
 ### 1. Install PlatformIO

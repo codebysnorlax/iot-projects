@@ -653,7 +653,10 @@
         let readingCount = 0;
         let startTime = Date.now();
         let lastDrawTime = 0;
+        let lastDataTime = 0;
+        let connectionCheckInterval;
         const maxHistoryLength = 100;
+        const CONNECTION_TIMEOUT = 5000; // 5 seconds without data = disconnected
 
         // Color palette from todo.md
         const colors = [
@@ -667,17 +670,29 @@
         const canvas = document.getElementById('tempChart');
         const ctx = canvas.getContext('2d');
 
+        function checkConnectionStatus() {
+            const now = Date.now();
+            if (lastDataTime > 0 && (now - lastDataTime) > CONNECTION_TIMEOUT) {
+                updateStatus('disconnected', 'No Data - Disconnected');
+            }
+        }
+
         function connectWebSocket() {
             ws = new WebSocket(`ws://${window.location.hostname}/ws`);
 
             ws.onopen = () => {
                 console.log('WebSocket connected');
-                updateStatus('connected', 'Connected');
+                updateStatus('connected', 'Waiting for data...');
+                
+                // Start monitoring connection based on data reception
+                if (connectionCheckInterval) clearInterval(connectionCheckInterval);
+                connectionCheckInterval = setInterval(checkConnectionStatus, 1000);
             };
 
             ws.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
+                    lastDataTime = Date.now(); // Update last data time
 
                     if (data.status === 'error') {
                         document.getElementById('temperature').textContent = 'ERR';
@@ -702,6 +717,7 @@
             ws.onclose = () => {
                 console.log('WebSocket disconnected');
                 updateStatus('disconnected', 'Disconnected');
+                if (connectionCheckInterval) clearInterval(connectionCheckInterval);
                 setTimeout(connectWebSocket, 3000);
             };
         }

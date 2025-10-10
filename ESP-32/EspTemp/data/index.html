@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #0a0a0a;
             min-height: 100vh;
-            padding: 10px;
+            padding: 16px;
             color: #e0e0e0;
         }
 
@@ -23,44 +24,64 @@
             max-width: 1200px;
             margin: 0 auto;
             background: #1a1a1a;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             overflow: hidden;
         }
 
         .header {
             background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-            padding: 20px;
+            padding: 24px 20px;
             text-align: center;
             color: #e0e0e0;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
         }
 
         .header h1 {
             font-size: clamp(24px, 5vw, 32px);
-            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
         }
 
         .main-content {
-            padding: 20px;
+            padding: 24px;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 24px;
         }
 
         .temp-section {
             display: grid;
             grid-template-columns: 1fr auto;
-            gap: 20px;
+            gap: 24px;
             align-items: center;
         }
 
         .temp-display {
             background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-            border-radius: 15px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 40px 32px;
             text-align: center;
             position: relative;
             overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .temp-display::before {
@@ -70,205 +91,498 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
             animation: shimmer 3s infinite;
         }
 
         @keyframes shimmer {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(10%, 10%); }
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(10%, 10%);
+            }
         }
 
         .temp-value-container {
             position: relative;
             z-index: 1;
+            width: 100%;
         }
 
         .temp-value {
-            font-size: clamp(48px, 12vw, 72px);
-            font-weight: bold;
+            font-size: clamp(56px, 15vw, 80px);
+            font-weight: 700;
             color: #e0e0e0;
-            text-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .counter {
+            display: inline-flex;
+            font-size: inherit;
+            color: inherit;
+        }
+
+        .digit {
+            position: relative;
+            width: 0.6em;
+            height: 1.2em;
+            overflow: hidden;
+            margin: 0 1px;
+        }
+
+        .digit .numbers {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .digit.drop .numbers {
+            transition: transform 0.3s ease-in;
+        }
+
+        .digit .numbers div {
+            height: 1.2em;
+            line-height: 1.2em;
+            text-align: center;
         }
 
         .temp-unit {
-            font-size: 0.4em;
+            font-size: 0.35em;
             vertical-align: super;
+            margin-left: 4px;
         }
 
         .temp-detail {
-            font-size: clamp(14px, 3vw, 18px);
-            color: rgba(224,224,224,0.7);
-            margin-top: 10px;
+            font-size: clamp(14px, 3.5vw, 18px);
+            color: rgba(224, 224, 224, 0.7);
+            margin-top: 16px;
+            font-weight: 500;
         }
 
         .trend-arrow {
             display: inline-block;
-            margin-left: 10px;
+            margin-left: 12px;
             font-size: 1.2em;
-            transition: all 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center;
         }
 
-        .trend-up { color: #ff4444; transform: rotate(-45deg); }
-        .trend-down { color: #44ff44; transform: rotate(45deg); }
-        .trend-stable { color: #ffff44; }
+        .trend-up {
+            color: #ff4444;
+            transform: rotate(-45deg) scale(1.2);
+            animation: bounce-up 0.6s ease;
+        }
+
+        .trend-down {
+            color: #44ff44;
+            transform: rotate(45deg) scale(1.2);
+            animation: bounce-down 0.6s ease;
+        }
+
+        .trend-stable {
+            color: #ffff44;
+            transform: scale(1.1);
+            animation: pulse-stable 1s ease infinite;
+        }
+
+        @keyframes bounce-up {
+
+            0%,
+            100% {
+                transform: rotate(-45deg) scale(1.2);
+            }
+
+            50% {
+                transform: rotate(-45deg) scale(1.4);
+            }
+        }
+
+        @keyframes bounce-down {
+
+            0%,
+            100% {
+                transform: rotate(45deg) scale(1.2);
+            }
+
+            50% {
+                transform: rotate(45deg) scale(1.4);
+            }
+        }
+
+        @keyframes pulse-stable {
+
+            0%,
+            100% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
 
         .unit-toggle {
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 50px;
-            padding: 8px;
+            padding: 6px;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
             backdrop-filter: blur(10px);
+            min-height: fit-content;
         }
 
         .toggle-btn {
             background: transparent;
             border: none;
             color: #e0e0e0;
-            padding: 8px 16px;
+            padding: 12px 20px;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 16px;
+            min-width: 60px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .toggle-btn:active {
+            transform: scale(0.95);
         }
 
         .toggle-btn.active {
-            background: rgba(255,255,255,0.2);
-            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .stat-card {
+        .stats-box {
             background: #2a2a2a;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
+            padding: 24px;
+            border-radius: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 20px;
             border-left: 4px solid #4a5568;
         }
 
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+        }
+
         .stat-label {
+            display: block;
             font-size: 12px;
             color: #a0a0a0;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .stat-value {
             font-size: clamp(18px, 4vw, 24px);
-            font-weight: bold;
+            font-weight: 700;
             color: #e0e0e0;
+            letter-spacing: -0.5px;
         }
 
         .chart-container {
             background: #2a2a2a;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
+            padding: 24px;
+            border-radius: 16px;
         }
 
         .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .chart-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: #e0e0e0;
         }
 
+        .chart-subtitle {
+            font-size: 13px;
+            color: #888;
+            font-weight: 500;
+        }
+
         .chart {
             width: 100%;
-            height: 300px;
+            height: 320px;
             border-radius: 8px;
         }
 
         .status {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 20px;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 24px;
             font-size: 14px;
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
         .status::before {
             content: '';
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
 
-        .status.connected::before { background: #4caf50; }
-        .status.disconnected::before { background: #f44336; }
-        .status.error::before { background: #ff9800; }
+        .status.connected::before {
+            background: #4caf50;
+        }
 
-        .status.connected { background: rgba(76, 175, 80, 0.2); color: #81c784; }
-        .status.disconnected { background: rgba(244, 67, 54, 0.2); color: #e57373; }
-        .status.error { background: rgba(255, 152, 0, 0.2); color: #ffb74d; }
+        .status.disconnected::before {
+            background: #f44336;
+        }
+
+        .status.error::before {
+            background: #ff9800;
+        }
+
+        .status.connected {
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
+        }
+
+        .status.disconnected {
+            background: rgba(244, 67, 54, 0.2);
+            color: #e57373;
+        }
+
+        .status.error {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffb74d;
+        }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
         }
 
         .footer {
             text-align: center;
-            padding: 20px;
+            padding: 20px 24px;
             color: #a0a0a0;
-            font-size: 12px;
+            font-size: 13px;
             border-top: 1px solid #333;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        @media (max-width: 768px) {
-            body { padding: 0; }
-            .container { margin: 0; border-radius: 0; }
-            .main-content { padding: 10px; }
-            .temp-section { grid-template-columns: 1fr; }
-            .unit-toggle { 
-                flex-direction: row; 
-                justify-self: center;
-                margin-top: 15px;
+        .footer-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Tablet styles */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            body {
+                padding: 20px;
             }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .chart { height: 250px; }
-            .header { padding: 15px; }
-            .footer { padding: 15px; }
+
+            .container {
+                border-radius: 24px;
+            }
+
+            .main-content {
+                padding: 28px;
+                gap: 28px;
+            }
+
+            .temp-display {
+                padding: 48px 40px;
+                min-height: 240px;
+            }
+
+            .chart {
+                height: 340px;
+            }
+
+            .stats-box {
+                grid-template-columns: repeat(4, 1fr);
+                padding: 28px;
+            }
+
+            .unit-toggle {
+                padding: 8px;
+                gap: 8px;
+            }
+
+            .toggle-btn {
+                padding: 14px 24px;
+                font-size: 17px;
+            }
         }
 
-        @media (max-width: 480px) {
-            .main-content { padding: 8px; }
-            .temp-display { padding: 15px; }
-            .stats-grid { grid-template-columns: 1fr; gap: 8px; }
-            .chart { height: 200px; }
-            .stat-card { padding: 15px; }
-            .chart-container { padding: 15px; margin: 15px 0; }
-            .header { padding: 12px; }
-            .footer { padding: 12px; }
+        /* Mobile styles */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .header {
+                padding: 20px 16px;
+                border-radius: 0;
+            }
+
+            .header-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .main-content {
+                padding: 20px 16px;
+                gap: 20px;
+            }
+
+            .temp-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .temp-display {
+                padding: 32px 20px;
+                min-height: 180px;
+                border-radius: 16px;
+            }
+
+            .unit-toggle {
+                flex-direction: row;
+                justify-self: center;
+                width: fit-content;
+                margin: 0 auto;
+            }
+
+            .toggle-btn {
+                padding: 14px 28px;
+                font-size: 16px;
+            }
+
+            .stats-box {
+                padding: 20px 16px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                border-radius: 16px;
+            }
+
+            .stat-item {
+                padding: 12px 8px;
+            }
+
+            .chart {
+                height: 280px;
+            }
+
+            .chart-container {
+                padding: 20px 16px;
+                border-radius: 16px;
+            }
+
+            .chart-header {
+                margin-bottom: 16px;
+            }
+
+            .footer {
+                padding: 20px 16px;
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+
+        /* Extra small mobile */
+        @media (max-width: 380px) {
+            .main-content {
+                padding: 16px 12px;
+                gap: 16px;
+            }
+
+            .temp-display {
+                padding: 28px 16px;
+                min-height: 160px;
+            }
+
+            .temp-value {
+                font-size: clamp(48px, 14vw, 72px);
+            }
+
+            .stats-box {
+                padding: 16px 12px;
+                gap: 12px;
+            }
+
+            .stat-item {
+                padding: 8px 4px;
+            }
+
+            .chart {
+                height: 240px;
+            }
+
+            .chart-container {
+                padding: 16px 12px;
+            }
+
+            .toggle-btn {
+                padding: 12px 24px;
+                font-size: 15px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌡️ Temperature Monitor</h1>
+            <div class="header-content">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />
+                    <circle cx="11.5" cy="18.5" r="1.5" fill="currentColor" />
+                </svg>
+                <h1>Temperature Monitor</h1>
+            </div>
             <div class="status" id="status">Connecting...</div>
         </div>
 
@@ -277,50 +591,53 @@
                 <div class="temp-display">
                     <div class="temp-value-container">
                         <div class="temp-value">
-                            <span id="temperature">--</span><span class="temp-unit" id="unit">°C</span>
-                            <span class="trend-arrow" id="trend">→</span>
+                            <div class="counter" id="temperature">--</div><span class="temp-unit" id="unit">°C</span>
                         </div>
                         <div class="temp-detail" id="tempDetail">Precise: -- °C</div>
                     </div>
                 </div>
-                
+
                 <div class="unit-toggle">
                     <button class="toggle-btn active" id="celsiusBtn" onclick="setUnit('C')">°C</button>
                     <button class="toggle-btn" id="fahrenheitBtn" onclick="setUnit('F')">°F</button>
                 </div>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Min Temp</div>
-                    <div class="stat-value" id="minTemp">--</div>
+            <div class="stats-box">
+                <div class="stat-item">
+                    <span class="stat-label">Min</span>
+                    <span class="stat-value" id="minTemp">--</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Max Temp</div>
-                    <div class="stat-value" id="maxTemp">--</div>
+                <div class="stat-item">
+                    <span class="stat-label">Max</span>
+                    <span class="stat-value" id="maxTemp">--</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Average</div>
-                    <div class="stat-value" id="avgTemp">--</div>
+                <div class="stat-item">
+                    <span class="stat-label">Avg</span>
+                    <span class="stat-value" id="avgTemp">--</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Readings</div>
-                    <div class="stat-value" id="readingCount">0</div>
+                <div class="stat-item">
+                    <span class="stat-label">Reads</span>
+                    <span class="stat-value" id="readingCount">0</span>
                 </div>
             </div>
 
             <div class="chart-container">
                 <div class="chart-header">
                     <div class="chart-title">Temperature History</div>
-                    <div style="font-size: 12px; color: #666;">Last 100 readings</div>
+                    <div class="chart-subtitle">Last 100 readings</div>
                 </div>
                 <canvas class="chart" id="tempChart"></canvas>
             </div>
         </div>
 
         <div class="footer">
-            Last update: <span id="lastUpdate">Never</span> | 
-            Uptime: <span id="uptime">00:00:00</span>
+            <div class="footer-item">
+                Last update: <span id="lastUpdate">Never</span>
+            </div>
+            <div class="footer-item">
+                Uptime: <span id="uptime">00:00:00</span>
+            </div>
         </div>
     </div>
 
@@ -390,100 +707,158 @@
         }
 
         function celsiusToFahrenheit(celsius) {
-            return (celsius * 9/5) + 32;
+            return (celsius * 9 / 5) + 32;
         }
 
         function setUnit(unit) {
+            const oldUnit = currentUnit;
             currentUnit = unit;
+
+            // Animate button switch
             document.getElementById('celsiusBtn').classList.toggle('active', unit === 'C');
             document.getElementById('fahrenheitBtn').classList.toggle('active', unit === 'F');
-            
+
             if (currentTemp !== null) {
-                displayTemperature(currentTemp);
-                updateStats();
+                // Smooth transition animation
+                const tempEl = document.getElementById('temperature');
+                tempEl.style.transform = 'scale(0.8)';
+                tempEl.style.opacity = '0.5';
+
+                setTimeout(() => {
+                    displayTemperature(currentTemp);
+                    updateStats();
+                    drawChart(); // Redraw chart with new unit
+
+                    tempEl.style.transform = 'scale(1)';
+                    tempEl.style.opacity = '1';
+                }, 200);
             }
         }
 
         function displayTemperature(tempC) {
             const temp = currentUnit === 'C' ? tempC : celsiusToFahrenheit(tempC);
             const unit = currentUnit === 'C' ? '°C' : '°F';
-            
+
             // Smooth value animation
             animateValue('temperature', temp, 1);
             document.getElementById('unit').textContent = unit;
             document.getElementById('tempDetail').textContent = `Precise: ${temp.toFixed(2)} ${unit}`;
-            
-            // Update trend arrow
-            updateTrendArrow(tempC);
+        }
+
+        function createCounter(value, decimals = 1) {
+            const valueStr = value.toFixed(decimals);
+            const digits = valueStr.replace('.', '');
+            let html = '';
+
+            for (let i = 0; i < valueStr.length; i++) {
+                const char = valueStr[i];
+                if (char === '.') {
+                    html += '<span style="width: 0.3em; text-align: center;">.</span>';
+                } else {
+                    html += `<div class="digit"><div class="numbers">`;
+                    for (let j = 0; j <= 9; j++) {
+                        html += `<div>${j}</div>`;
+                    }
+                    html += `</div></div>`;
+                }
+            }
+            return html;
+        }
+
+        function animateCounter(elementId, targetValue, decimals = 1) {
+            const element = document.getElementById(elementId);
+            const targetStr = targetValue.toFixed(decimals);
+
+            // Create counter structure if not exists
+            if (!element.querySelector('.digit')) {
+                element.innerHTML = createCounter(targetValue, decimals);
+            }
+
+            const digits = element.querySelectorAll('.digit');
+            let digitIndex = 0;
+
+            for (let i = 0; i < targetStr.length; i++) {
+                const char = targetStr[i];
+                if (char !== '.') {
+                    const digit = digits[digitIndex];
+                    const numbers = digit.querySelector('.numbers');
+                    const targetDigit = parseInt(char);
+
+                    // Add drop class for faster animation
+                    digit.classList.add('drop');
+
+                    // Animate to target digit
+                    numbers.style.transform = `translateY(-${targetDigit * 1.2}em)`;
+
+                    // Remove drop class after animation
+                    setTimeout(() => {
+                        digit.classList.remove('drop');
+                    }, 300);
+
+                    digitIndex++;
+                }
+            }
         }
 
         function animateValue(elementId, targetValue, decimals) {
+            animateCounter(elementId, targetValue, decimals);
+        }
+
+        function animateStatValue(elementId, targetValue, unit) {
             const element = document.getElementById(elementId);
             const startValue = parseFloat(element.textContent) || 0;
             const difference = targetValue - startValue;
-            const duration = 500;
+            const duration = 600;
             const startTime = performance.now();
 
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                
-                // Easing function for smooth animation
+
+                // Smooth easing
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 const currentValue = startValue + (difference * easeOut);
-                
-                element.textContent = currentValue.toFixed(decimals);
-                
+
+                element.textContent = currentValue.toFixed(1) + unit;
+
+                // Color pulse effect
+                const intensity = Math.sin(progress * Math.PI);
+                element.style.color = `hsl(200, 70%, ${50 + intensity * 20}%)`;
+
                 if (progress < 1) {
                     requestAnimationFrame(animate);
-                }
-            }
-            
-            requestAnimationFrame(animate);
-        }
-
-        function updateTrendArrow(tempC) {
-            const trendEl = document.getElementById('trend');
-            
-            if (previousTemp !== null) {
-                const diff = tempC - previousTemp;
-                if (diff > 0.1) {
-                    trendEl.textContent = '↗';
-                    trendEl.className = 'trend-arrow trend-up';
-                } else if (diff < -0.1) {
-                    trendEl.textContent = '↘';
-                    trendEl.className = 'trend-arrow trend-down';
                 } else {
-                    trendEl.textContent = '→';
-                    trendEl.className = 'trend-arrow trend-stable';
+                    element.style.color = '#e0e0e0';
                 }
             }
+
+            requestAnimationFrame(animate);
         }
 
         function updateTemperature(tempC) {
             previousTemp = currentTemp;
             currentTemp = tempC;
-            
+
             displayTemperature(tempC);
-            
+
             // Update statistics
             readingCount++;
             tempSum += tempC;
-            
+
             if (tempC < minTemp) minTemp = tempC;
             if (tempC > maxTemp) maxTemp = tempC;
-            
+
             updateStats();
-            
+
             // Update history
             tempHistory.push(tempC);
             if (tempHistory.length > maxHistoryLength) {
                 tempHistory.shift();
             }
 
-            // Throttled chart redraw
+            // Throttled chart redraw for smooth animation
             const now = performance.now();
-            if (now - lastDrawTime > 16) {
+            if (now - lastDrawTime > 50) {
                 drawChart();
                 lastDrawTime = now;
             }
@@ -494,11 +869,28 @@
             const maxDisplay = currentUnit === 'C' ? maxTemp : celsiusToFahrenheit(maxTemp);
             const avgDisplay = currentUnit === 'C' ? (tempSum / readingCount) : celsiusToFahrenheit(tempSum / readingCount);
             const unit = currentUnit === 'C' ? '°C' : '°F';
-            
-            document.getElementById('minTemp').textContent = minDisplay.toFixed(1) + unit;
-            document.getElementById('maxTemp').textContent = maxDisplay.toFixed(1) + unit;
-            document.getElementById('avgTemp').textContent = avgDisplay.toFixed(1) + unit;
-            document.getElementById('readingCount').textContent = readingCount;
+
+            animateStatValue('minTemp', minDisplay, unit);
+            animateStatValue('maxTemp', maxDisplay, unit);
+            animateStatValue('avgTemp', avgDisplay, unit);
+
+            // Animate reading count with counter effect
+            const countEl = document.getElementById('readingCount');
+            const startCount = parseInt(countEl.textContent) || 0;
+            const duration = 300;
+            const startTime = performance.now();
+
+            function animateCount(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const currentCount = Math.floor(startCount + (readingCount - startCount) * progress);
+                countEl.textContent = currentCount;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateCount);
+                }
+            }
+            requestAnimationFrame(animateCount);
         }
 
         function updateStatus(type, text) {
@@ -518,22 +910,29 @@
             const hours = Math.floor(elapsed / 3600000);
             const minutes = Math.floor((elapsed % 3600000) / 60000);
             const seconds = Math.floor((elapsed % 60000) / 1000);
-            
-            document.getElementById('uptime').textContent = 
+
+            document.getElementById('uptime').textContent =
                 `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
         function getTemperatureColor(temp) {
-            // Map temperature to color index (assuming 0-40°C range)
-            const normalizedTemp = Math.max(0, Math.min(40, temp)) / 40;
+            // Use color palette from todo.md
+            const minRange = Math.min(...tempHistory);
+            const maxRange = Math.max(...tempHistory);
+            const normalizedTemp = (temp - minRange) / (maxRange - minRange || 1);
             const colorIndex = Math.floor(normalizedTemp * (colors.length - 1));
             return colors[colorIndex];
         }
 
         function drawChart() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
             const width = canvas.width;
             const height = canvas.height;
-            const padding = 40;
+            const padding = 50 * dpr;
             const chartWidth = width - padding * 2;
             const chartHeight = height - padding * 2;
 
@@ -541,110 +940,119 @@
 
             if (tempHistory.length < 2) return;
 
-            const minVal = Math.min(...tempHistory) - 1;
-            const maxVal = Math.max(...tempHistory) + 1;
-            const range = maxVal - minVal;
+            // Convert temperature history to display unit
+            const displayHistory = tempHistory.map(temp =>
+                currentUnit === 'C' ? temp : celsiusToFahrenheit(temp)
+            );
 
-            // Draw grid lines
-            ctx.strokeStyle = '#404040';
-            ctx.lineWidth = 1;
-            
-            // Horizontal grid lines
-            for (let i = 0; i <= 5; i++) {
-                const y = padding + (chartHeight / 5) * i;
+            const minVal = Math.min(...displayHistory) - 0.5;
+            const maxVal = Math.max(...displayHistory) + 0.5;
+            const range = maxVal - minVal;
+            const xStep = chartWidth / (maxHistoryLength - 1);
+
+            // Draw grid
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1 * dpr;
+
+            for (let i = 0; i <= 8; i++) {
+                const y = padding + (chartHeight / 8) * i;
                 ctx.beginPath();
                 ctx.moveTo(padding, y);
                 ctx.lineTo(width - padding, y);
                 ctx.stroke();
+
+                // Show actual values from max to min
+                const value = maxVal - (range / 8) * i;
                 
-                // Y-axis labels
-                const value = maxVal - (range / 5) * i;
-                ctx.fillStyle = '#a0a0a0';
-                ctx.font = '12px sans-serif';
+                ctx.fillStyle = '#666';
+                ctx.font = `${11 * dpr}px monospace`;
                 ctx.textAlign = 'right';
-                ctx.fillText(value.toFixed(1) + '°C', padding - 5, y + 4);
+                ctx.textBaseline = 'middle';
+                ctx.fillText(value.toFixed(1) + (currentUnit === 'C' ? '°C' : '°F'), padding - (8 * dpr), y);
             }
-            
-            // Vertical grid lines
-            const xStep = chartWidth / (maxHistoryLength - 1);
-            for (let i = 0; i < maxHistoryLength; i += 20) {
+
+            for (let i = 0; i < maxHistoryLength; i += 10) {
                 const x = padding + i * xStep;
+                ctx.strokeStyle = i % 20 === 0 ? '#444' : '#2a2a2a';
+                ctx.lineWidth = (i % 20 === 0 ? 1 : 0.5) * dpr;
                 ctx.beginPath();
                 ctx.moveTo(x, padding);
                 ctx.lineTo(x, height - padding);
                 ctx.stroke();
             }
 
-            // Draw temperature line with gradient
-            const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
-            gradient.addColorStop(0, 'rgba(77, 182, 172, 0.8)');
-            gradient.addColorStop(1, 'rgba(237, 117, 97, 0.8)');
+            // Create points using display values
+            const points = displayHistory.map((temp, i) => ({
+                x: padding + (i / (maxHistoryLength - 1)) * chartWidth,
+                y: padding + chartHeight - ((temp - minVal) / range) * chartHeight,
+                temp: tempHistory[i] // Use original Celsius for color
+            }));
 
-            ctx.beginPath();
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 3;
-            ctx.lineJoin = 'round';
-            ctx.lineCap = 'round';
+            // Draw smooth curve
+            if (points.length > 1) {
+                // Create gradient based on temperature range
+                const strokeGradient = ctx.createLinearGradient(0, 0, width, 0);
+                const minTemp = Math.min(...tempHistory);
+                const maxTemp = Math.max(...tempHistory);
 
-            tempHistory.forEach((temp, i) => {
-                const x = padding + i * xStep;
-                const y = padding + chartHeight - ((temp - minVal) / range) * chartHeight;
+                strokeGradient.addColorStop(0, getTemperatureColor(minTemp));
+                strokeGradient.addColorStop(0.5, getTemperatureColor((minTemp + maxTemp) / 2));
+                strokeGradient.addColorStop(1, getTemperatureColor(maxTemp));
 
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            });
-
-            ctx.stroke();
-
-            // Draw area fill
-            ctx.lineTo(padding + (tempHistory.length - 1) * xStep, height - padding);
-            ctx.lineTo(padding, height - padding);
-            ctx.closePath();
-
-            const areaGradient = ctx.createLinearGradient(0, padding, 0, height - padding);
-            areaGradient.addColorStop(0, 'rgba(77, 182, 172, 0.2)');
-            areaGradient.addColorStop(1, 'rgba(77, 182, 172, 0.02)');
-            ctx.fillStyle = areaGradient;
-            ctx.fill();
-
-            // Draw data points with color coding
-            tempHistory.forEach((temp, i) => {
-                const x = padding + i * xStep;
-                const y = padding + chartHeight - ((temp - minVal) / range) * chartHeight;
-                
                 ctx.beginPath();
-                ctx.fillStyle = getTemperatureColor(temp);
-                ctx.arc(x, y, 3, 0, Math.PI * 2);
-                ctx.fill();
-            });
+                ctx.strokeStyle = strokeGradient;
+                ctx.lineWidth = 3 * dpr;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
 
-            // Draw axis labels
-            ctx.fillStyle = '#e0e0e0';
-            ctx.font = 'bold 14px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('Temperature History', width / 2, 25);
+                ctx.moveTo(points[0].x, points[0].y);
+
+                for (let i = 1; i < points.length - 1; i++) {
+                    const cp1x = (points[i - 1].x + points[i].x) / 2;
+                    const cp1y = points[i - 1].y;
+
+                    ctx.quadraticCurveTo(cp1x, cp1y, points[i].x, points[i].y);
+                }
+
+                if (points.length > 1) {
+                    ctx.quadraticCurveTo(
+                        points[points.length - 2].x,
+                        points[points.length - 2].y,
+                        points[points.length - 1].x,
+                        points[points.length - 1].y
+                    );
+                }
+
+                ctx.stroke();
+
+                // Area fill
+                ctx.lineTo(points[points.length - 1].x, height - padding);
+                ctx.lineTo(points[0].x, height - padding);
+                ctx.closePath();
+
+                const fillGradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+                fillGradient.addColorStop(0, getTemperatureColor(maxTemp) + '30');
+                fillGradient.addColorStop(1, getTemperatureColor(minTemp) + '05');
+                ctx.fillStyle = fillGradient;
+                ctx.fill();
+            }
         }
 
         function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * window.devicePixelRatio;
-            canvas.height = rect.height * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
             drawChart();
         }
 
         // Initialize
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
-        
+
         // Update uptime every second
         setInterval(updateUptime, 1000);
-        
+
         // Start WebSocket connection
         connectWebSocket();
     </script>
 </body>
+
 </html>
+

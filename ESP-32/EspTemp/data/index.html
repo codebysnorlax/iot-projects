@@ -12,37 +12,53 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 10px;
+            color: #e0e0e0;
         }
 
         .container {
-            background: white;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #1a1a1a;
             border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 500px;
-            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            overflow: hidden;
         }
 
-        h1 {
+        .header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            padding: 20px;
             text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 28px;
+            color: #e0e0e0;
+        }
+
+        .header h1 {
+            font-size: clamp(24px, 5vw, 32px);
+            margin-bottom: 10px;
+        }
+
+        .main-content {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .temp-section {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: center;
         }
 
         .temp-display {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
             border-radius: 15px;
-            padding: 40px 20px;
+            padding: 30px;
             text-align: center;
-            margin-bottom: 25px;
             position: relative;
             overflow: hidden;
         }
@@ -54,7 +70,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
             animation: shimmer 3s infinite;
         }
 
@@ -63,143 +79,272 @@
             50% { transform: translate(10%, 10%); }
         }
 
-        .temp-value {
-            font-size: 72px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        .temp-value-container {
             position: relative;
             z-index: 1;
+        }
+
+        .temp-value {
+            font-size: clamp(48px, 12vw, 72px);
+            font-weight: bold;
+            color: #e0e0e0;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
         }
 
         .temp-unit {
-            font-size: 32px;
+            font-size: 0.4em;
             vertical-align: super;
         }
 
-        .status {
+        .temp-detail {
+            font-size: clamp(14px, 3vw, 18px);
+            color: rgba(224,224,224,0.7);
+            margin-top: 10px;
+        }
+
+        .trend-arrow {
             display: inline-block;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 14px;
+            margin-left: 10px;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .trend-up { color: #ff4444; transform: rotate(-45deg); }
+        .trend-down { color: #44ff44; transform: rotate(45deg); }
+        .trend-stable { color: #ffff44; }
+
+        .unit-toggle {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            backdrop-filter: blur(10px);
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             font-weight: 600;
-            margin-top: 15px;
-            position: relative;
-            z-index: 1;
+            font-size: 14px;
         }
 
-        .status.connected {
-            background: rgba(76, 175, 80, 0.2);
-            color: white;
+        .toggle-btn.active {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
         }
 
-        .status.disconnected {
-            background: rgba(244, 67, 54, 0.2);
-            color: white;
-        }
-
-        .status.error {
-            background: rgba(255, 152, 0, 0.2);
-            color: white;
-        }
-
-        .info-grid {
+        .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 15px;
-            margin-bottom: 25px;
+            margin: 20px 0;
         }
 
-        .info-card {
-            background: #f5f5f5;
+        .stat-card {
+            background: #2a2a2a;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 12px;
             text-align: center;
+            border-left: 4px solid #4a5568;
         }
 
-        .info-label {
+        .stat-label {
             font-size: 12px;
-            color: #666;
+            color: #a0a0a0;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 8px;
         }
 
-        .info-value {
-            font-size: 24px;
+        .stat-value {
+            font-size: clamp(18px, 4vw, 24px);
             font-weight: bold;
-            color: #333;
+            color: #e0e0e0;
         }
 
         .chart-container {
-            background: #f5f5f5;
+            background: #2a2a2a;
             padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e0e0e0;
         }
 
         .chart {
             width: 100%;
-            height: 150px;
+            height: 300px;
+            border-radius: 8px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status.connected::before { background: #4caf50; }
+        .status.disconnected::before { background: #f44336; }
+        .status.error::before { background: #ff9800; }
+
+        .status.connected { background: rgba(76, 175, 80, 0.2); color: #81c784; }
+        .status.disconnected { background: rgba(244, 67, 54, 0.2); color: #e57373; }
+        .status.error { background: rgba(255, 152, 0, 0.2); color: #ffb74d; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .footer {
             text-align: center;
-            color: #999;
+            padding: 20px;
+            color: #a0a0a0;
             font-size: 12px;
+            border-top: 1px solid #333;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            .container { margin: 0; border-radius: 0; }
+            .main-content { padding: 10px; }
+            .temp-section { grid-template-columns: 1fr; }
+            .unit-toggle { 
+                flex-direction: row; 
+                justify-self: center;
+                margin-top: 15px;
+            }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .chart { height: 250px; }
+            .header { padding: 15px; }
+            .footer { padding: 15px; }
         }
 
         @media (max-width: 480px) {
-            .temp-value {
-                font-size: 56px;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
+            .main-content { padding: 8px; }
+            .temp-display { padding: 15px; }
+            .stats-grid { grid-template-columns: 1fr; gap: 8px; }
+            .chart { height: 200px; }
+            .stat-card { padding: 15px; }
+            .chart-container { padding: 15px; margin: 15px 0; }
+            .header { padding: 12px; }
+            .footer { padding: 12px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌡️ Temperature Monitor</h1>
-
-        <div class="temp-display">
-            <div class="temp-value">
-                <span id="temperature">--</span><span class="temp-unit">°C</span>
-            </div>
+        <div class="header">
+            <h1>🌡️ Temperature Monitor</h1>
             <div class="status" id="status">Connecting...</div>
         </div>
 
-        <div class="info-grid">
-            <div class="info-card">
-                <div class="info-label">Min Temp</div>
-                <div class="info-value" id="minTemp">--°C</div>
+        <div class="main-content">
+            <div class="temp-section">
+                <div class="temp-display">
+                    <div class="temp-value-container">
+                        <div class="temp-value">
+                            <span id="temperature">--</span><span class="temp-unit" id="unit">°C</span>
+                            <span class="trend-arrow" id="trend">→</span>
+                        </div>
+                        <div class="temp-detail" id="tempDetail">Precise: -- °C</div>
+                    </div>
+                </div>
+                
+                <div class="unit-toggle">
+                    <button class="toggle-btn active" id="celsiusBtn" onclick="setUnit('C')">°C</button>
+                    <button class="toggle-btn" id="fahrenheitBtn" onclick="setUnit('F')">°F</button>
+                </div>
             </div>
-            <div class="info-card">
-                <div class="info-label">Max Temp</div>
-                <div class="info-value" id="maxTemp">--°C</div>
-            </div>
-        </div>
 
-        <div class="chart-container">
-            <div class="info-label" style="margin-bottom: 10px;">Temperature History</div>
-            <canvas class="chart" id="tempChart"></canvas>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Min Temp</div>
+                    <div class="stat-value" id="minTemp">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Max Temp</div>
+                    <div class="stat-value" id="maxTemp">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Average</div>
+                    <div class="stat-value" id="avgTemp">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Readings</div>
+                    <div class="stat-value" id="readingCount">0</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">Temperature History</div>
+                    <div style="font-size: 12px; color: #666;">Last 100 readings</div>
+                </div>
+                <canvas class="chart" id="tempChart"></canvas>
+            </div>
         </div>
 
         <div class="footer">
-            Last update: <span id="lastUpdate">Never</span>
+            Last update: <span id="lastUpdate">Never</span> | 
+            Uptime: <span id="uptime">00:00:00</span>
         </div>
     </div>
 
     <script>
         let ws;
+        let currentUnit = 'C';
+        let currentTemp = null;
+        let previousTemp = null;
         let minTemp = Infinity;
         let maxTemp = -Infinity;
         let tempHistory = [];
-        let updateCount = 0;
+        let tempSum = 0;
+        let readingCount = 0;
+        let startTime = Date.now();
         let lastDrawTime = 0;
-        const maxHistoryLength = 100;  // More data points for smoother chart
+        const maxHistoryLength = 100;
+
+        // Color palette from todo.md
+        const colors = [
+            "#0D47A1", "#1565C0", "#1976D2", "#1E88E5", "#2979FF",
+            "#0091EA", "#00B8D4", "#00E5FF", "#00E676", "#00FF00",
+            "#76FF03", "#C6FF00", "#FFB300", "#FF9100", "#FF6D00",
+            "#FF3D00", "#FF1744", "#D50000", "#B71C1C", "#8B0000"
+        ];
 
         // Chart setup
         const canvas = document.getElementById('tempChart');
@@ -244,32 +389,116 @@
             };
         }
 
-        function updateTemperature(temp) {
-            document.getElementById('temperature').textContent = temp.toFixed(1);
+        function celsiusToFahrenheit(celsius) {
+            return (celsius * 9/5) + 32;
+        }
 
-            // Update min/max
-            if (temp < minTemp) {
-                minTemp = temp;
-                document.getElementById('minTemp').textContent = temp.toFixed(1) + '°C';
+        function setUnit(unit) {
+            currentUnit = unit;
+            document.getElementById('celsiusBtn').classList.toggle('active', unit === 'C');
+            document.getElementById('fahrenheitBtn').classList.toggle('active', unit === 'F');
+            
+            if (currentTemp !== null) {
+                displayTemperature(currentTemp);
+                updateStats();
             }
-            if (temp > maxTemp) {
-                maxTemp = temp;
-                document.getElementById('maxTemp').textContent = temp.toFixed(1) + '°C';
-            }
+        }
 
+        function displayTemperature(tempC) {
+            const temp = currentUnit === 'C' ? tempC : celsiusToFahrenheit(tempC);
+            const unit = currentUnit === 'C' ? '°C' : '°F';
+            
+            // Smooth value animation
+            animateValue('temperature', temp, 1);
+            document.getElementById('unit').textContent = unit;
+            document.getElementById('tempDetail').textContent = `Precise: ${temp.toFixed(2)} ${unit}`;
+            
+            // Update trend arrow
+            updateTrendArrow(tempC);
+        }
+
+        function animateValue(elementId, targetValue, decimals) {
+            const element = document.getElementById(elementId);
+            const startValue = parseFloat(element.textContent) || 0;
+            const difference = targetValue - startValue;
+            const duration = 500;
+            const startTime = performance.now();
+
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function for smooth animation
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (difference * easeOut);
+                
+                element.textContent = currentValue.toFixed(decimals);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        function updateTrendArrow(tempC) {
+            const trendEl = document.getElementById('trend');
+            
+            if (previousTemp !== null) {
+                const diff = tempC - previousTemp;
+                if (diff > 0.1) {
+                    trendEl.textContent = '↗';
+                    trendEl.className = 'trend-arrow trend-up';
+                } else if (diff < -0.1) {
+                    trendEl.textContent = '↘';
+                    trendEl.className = 'trend-arrow trend-down';
+                } else {
+                    trendEl.textContent = '→';
+                    trendEl.className = 'trend-arrow trend-stable';
+                }
+            }
+        }
+
+        function updateTemperature(tempC) {
+            previousTemp = currentTemp;
+            currentTemp = tempC;
+            
+            displayTemperature(tempC);
+            
+            // Update statistics
+            readingCount++;
+            tempSum += tempC;
+            
+            if (tempC < minTemp) minTemp = tempC;
+            if (tempC > maxTemp) maxTemp = tempC;
+            
+            updateStats();
+            
             // Update history
-            tempHistory.push(temp);
+            tempHistory.push(tempC);
             if (tempHistory.length > maxHistoryLength) {
                 tempHistory.shift();
             }
 
-            // Throttle chart redraw to 60fps max (every ~16ms)
-            updateCount++;
+            // Throttled chart redraw
             const now = performance.now();
             if (now - lastDrawTime > 16) {
                 drawChart();
                 lastDrawTime = now;
             }
+        }
+
+        function updateStats() {
+            const minDisplay = currentUnit === 'C' ? minTemp : celsiusToFahrenheit(minTemp);
+            const maxDisplay = currentUnit === 'C' ? maxTemp : celsiusToFahrenheit(maxTemp);
+            const avgDisplay = currentUnit === 'C' ? (tempSum / readingCount) : celsiusToFahrenheit(tempSum / readingCount);
+            const unit = currentUnit === 'C' ? '°C' : '°F';
+            
+            document.getElementById('minTemp').textContent = minDisplay.toFixed(1) + unit;
+            document.getElementById('maxTemp').textContent = maxDisplay.toFixed(1) + unit;
+            document.getElementById('avgTemp').textContent = avgDisplay.toFixed(1) + unit;
+            document.getElementById('readingCount').textContent = readingCount;
         }
 
         function updateStatus(type, text) {
@@ -284,9 +513,29 @@
             document.getElementById('lastUpdate').textContent = timeStr;
         }
 
+        function updateUptime() {
+            const elapsed = Date.now() - startTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            
+            document.getElementById('uptime').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function getTemperatureColor(temp) {
+            // Map temperature to color index (assuming 0-40°C range)
+            const normalizedTemp = Math.max(0, Math.min(40, temp)) / 40;
+            const colorIndex = Math.floor(normalizedTemp * (colors.length - 1));
+            return colors[colorIndex];
+        }
+
         function drawChart() {
             const width = canvas.width;
             const height = canvas.height;
+            const padding = 40;
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
 
             ctx.clearRect(0, 0, width, height);
 
@@ -296,18 +545,50 @@
             const maxVal = Math.max(...tempHistory) + 1;
             const range = maxVal - minVal;
 
-            const xStep = width / (maxHistoryLength - 1);
-            const yScale = height / range;
+            // Draw grid lines
+            ctx.strokeStyle = '#404040';
+            ctx.lineWidth = 1;
+            
+            // Horizontal grid lines
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+                
+                // Y-axis labels
+                const value = maxVal - (range / 5) * i;
+                ctx.fillStyle = '#a0a0a0';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(value.toFixed(1) + '°C', padding - 5, y + 4);
+            }
+            
+            // Vertical grid lines
+            const xStep = chartWidth / (maxHistoryLength - 1);
+            for (let i = 0; i < maxHistoryLength; i += 20) {
+                const x = padding + i * xStep;
+                ctx.beginPath();
+                ctx.moveTo(x, padding);
+                ctx.lineTo(x, height - padding);
+                ctx.stroke();
+            }
 
-            // Draw line
+            // Draw temperature line with gradient
+            const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+            gradient.addColorStop(0, 'rgba(77, 182, 172, 0.8)');
+            gradient.addColorStop(1, 'rgba(237, 117, 97, 0.8)');
+
             ctx.beginPath();
-            ctx.strokeStyle = '#667eea';
+            ctx.strokeStyle = gradient;
             ctx.lineWidth = 3;
             ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
 
             tempHistory.forEach((temp, i) => {
-                const x = i * xStep;
-                const y = height - ((temp - minVal) * yScale);
+                const x = padding + i * xStep;
+                const y = padding + chartHeight - ((temp - minVal) / range) * chartHeight;
 
                 if (i === 0) {
                     ctx.moveTo(x, y);
@@ -318,19 +599,35 @@
 
             ctx.stroke();
 
-            // Draw gradient fill
-            ctx.lineTo(width, height);
-            ctx.lineTo(0, height);
+            // Draw area fill
+            ctx.lineTo(padding + (tempHistory.length - 1) * xStep, height - padding);
+            ctx.lineTo(padding, height - padding);
             ctx.closePath();
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, 'rgba(102, 126, 234, 0.3)');
-            gradient.addColorStop(1, 'rgba(102, 126, 234, 0.05)');
-            ctx.fillStyle = gradient;
+            const areaGradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+            areaGradient.addColorStop(0, 'rgba(77, 182, 172, 0.2)');
+            areaGradient.addColorStop(1, 'rgba(77, 182, 172, 0.02)');
+            ctx.fillStyle = areaGradient;
             ctx.fill();
+
+            // Draw data points with color coding
+            tempHistory.forEach((temp, i) => {
+                const x = padding + i * xStep;
+                const y = padding + chartHeight - ((temp - minVal) / range) * chartHeight;
+                
+                ctx.beginPath();
+                ctx.fillStyle = getTemperatureColor(temp);
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw axis labels
+            ctx.fillStyle = '#e0e0e0';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Temperature History', width / 2, 25);
         }
 
-        // Set canvas size
         function resizeCanvas() {
             const rect = canvas.getBoundingClientRect();
             canvas.width = rect.width * window.devicePixelRatio;
@@ -339,10 +636,14 @@
             drawChart();
         }
 
+        // Initialize
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
-
-        // Start connection
+        
+        // Update uptime every second
+        setInterval(updateUptime, 1000);
+        
+        // Start WebSocket connection
         connectWebSocket();
     </script>
 </body>
